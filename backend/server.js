@@ -54,6 +54,10 @@ mongoose.connect(mongoURI)
     .catch(err => console.error('MongoDB connection error:', err));
 
 // Routes
+app.get('/', (req, res) => {
+    res.send('Hostel Management System (HMS) Backend is running! 🏩');
+});
+
 app.get('/api/test', (req, res) => {
     res.json({ message: 'Backend Connected Successfully' });
 });

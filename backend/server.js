@@ -39,6 +39,7 @@ const upload = multer({ storage: storage });
 
 // MongoDB Connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/hostel';
+console.log('Attempting to connect to MongoDB with URI:', mongoURI.replace(/:([^@]+)@/, ':****@'));
 mongoose.connect(mongoURI)
     .then(async () => {
         console.log('MongoDB connected successfully');
@@ -705,14 +706,17 @@ const Complaint = require('./models/Complaint');
 // Student: File a Complaint
 app.post('/api/complaints', verifyToken, async (req, res) => {
     try {
-        // Find existing booking to auto-fill room number if they have one
-        const booking = await Booking.findOne({ userId: req.user._id, status: 'Approved', paymentStatus: 'Paid' });
+        // RESTRICTION: Student must have an assigned room to file a complaint
+        const currentRoom = req.user.roomAllocation;
+        if (!currentRoom) {
+            return res.status(403).json({ message: 'Complaint denied: You must be assigned a room before you can file a complaint.' });
+        }
         
         const complaint = new Complaint({
             userId: req.user._id,
             studentName: req.user.name || 'Unknown',
             studentId: req.user.studentId || 'Unknown',
-            roomNumber: booking?.roomNumber || 'Not Assigned',
+            roomNumber: currentRoom || 'Not Assigned',
             title: req.body.title,
             description: req.body.description,
             status: 'Pending'
@@ -738,8 +742,18 @@ app.get('/api/complaints/my', verifyToken, async (req, res) => {
 // Admin: Get All Complaints
 app.get('/api/admin/complaints', verifyToken, isAdmin, async (req, res) => {
     try {
-        const complaints = await Complaint.find().sort({ createdAt: -1 });
-        res.json(complaints);
+        const complaints = await Complaint.find().populate('userId', 'roomAllocation name studentId').sort({ createdAt: -1 });
+        const enrichedComplaints = complaints.map(c => {
+            const obj = c.toObject();
+            if (c.userId) {
+                // Return latest profile info if possible, otherwise fallback to frozen complaint data
+                obj.roomNumber = c.userId.roomAllocation || c.roomNumber || 'Not Assigned';
+                obj.studentName = c.userId.name || c.studentName;
+                obj.studentId = c.userId.studentId || c.studentId;
+            }
+            return obj;
+        });
+        res.json(enrichedComplaints);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching all complaints', error: error.message });
     }

@@ -9,6 +9,8 @@ const StudentComplaints = () => {
     const [description, setDescription] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
+    const [userProfile, setUserProfile] = useState(null);
+    const [isAssigned, setIsAssigned] = useState(false);
 
     useEffect(() => {
         fetchComplaints();
@@ -21,6 +23,14 @@ const StudentComplaints = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setComplaints(res.data);
+
+            // Fetch latest user profile to check room assignment
+            const userRes = await axios.post('http://localhost:5000/api/users', {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const userData = userRes.data.user;
+            setUserProfile(userData);
+            setIsAssigned(!!userData.roomAllocation);
         } catch (error) {
             console.error('Error fetching complaints:', error);
         } finally {
@@ -101,42 +111,53 @@ const StudentComplaints = () => {
 
             <div className="row g-4">
                 <div className="col-lg-5">
-                    <div className="card shadow-sm border-0 rounded-4 mb-4 mb-lg-0">
-                        <div className="card-header bg-white border-bottom py-3">
-                            <h5 className="fw-bold text-primary mb-0"><i className="bi bi-pencil-square me-2"></i>File a Complaint</h5>
+                    {!loading && !isAssigned ? (
+                        <div className="card shadow-sm border-0 rounded-4 mb-4 mb-lg-0 bg-light p-4 text-center">
+                            <div className="bg-warning bg-opacity-10 text-warning mx-auto rounded-circle d-flex align-items-center justify-content-center mb-3" style={{ width: '60px', height: '60px', fontSize: '1.5rem' }}>
+                                <i className="bi bi-shield-lock-fill"></i>
+                            </div>
+                            <h5 className="fw-bold">Feature Restricted</h5>
+                            <p className="text-muted small">You can only file complaints *after* a room has been officially assigned to you. Please contact the warden if you haven't received your room yet.</p>
+                            <div className="badge bg-warning text-dark rounded-pill px-3 py-2 mt-2">Room Assigned: NO</div>
                         </div>
-                        <div className="card-body p-4">
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-3">
-                                    <label className="form-label fs-5 fw-bold text-muted">Issue Title</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control rounded-3 py-2 bg-light border-0 px-3 shadow-none" 
-                                        placeholder="e.g. Broken Fan, Water Purifier Issue"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        required
-                                        maxLength={100}
-                                    />
-                                </div>
-                                <div className="mb-4">
-                                    <label className="form-label fs-5 fw-bold text-muted">Detailed Description</label>
-                                    <textarea 
-                                        className="form-control rounded-3 py-2 bg-light border-0 px-3 shadow-none" 
-                                        rows="5" 
-                                        placeholder="Please provide specifics of the issue so the admin team can resolve it efficiently..."
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        required
-                                    ></textarea>
-                                </div>
-                                <button type="submit" className="btn btn-primary w-100 py-2 rounded-pill fw-bold hover-lift shadow-sm d-flex align-items-center justify-content-center" disabled={submitting}>
-                                    {submitting ? <span className="spinner-border spinner-border-sm me-2"></span> : <i className="bi bi-send-fill me-2"></i>}
-                                    {submitting ? 'Submitting...' : 'Submit Complaint'}
-                                </button>
-                            </form>
+                    ) : (
+                        <div className="card shadow-sm border-0 rounded-4 mb-4 mb-lg-0">
+                            <div className="card-header bg-white border-bottom py-3">
+                                <h5 className="fw-bold text-primary mb-0"><i className="bi bi-pencil-square me-2"></i>File a Complaint</h5>
+                            </div>
+                            <div className="card-body p-4">
+                                <form onSubmit={handleSubmit}>
+                                    <div className="mb-3">
+                                        <label className="form-label fs-5 fw-bold text-muted">Issue Title</label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control rounded-3 py-2 bg-light border-0 px-3 shadow-none" 
+                                            placeholder="e.g. Broken Fan, Water Purifier Issue"
+                                            value={title}
+                                            onChange={(e) => setTitle(e.target.value)}
+                                            required
+                                            maxLength={100}
+                                        />
+                                    </div>
+                                    <div className="mb-4">
+                                        <label className="form-label fs-5 fw-bold text-muted">Detailed Description</label>
+                                        <textarea 
+                                            className="form-control rounded-3 py-2 bg-light border-0 px-3 shadow-none" 
+                                            rows="5" 
+                                            placeholder="Please provide specifics of the issue so the admin team can resolve it efficiently..."
+                                            value={description}
+                                            onChange={(e) => setDescription(e.target.value)}
+                                            required
+                                        ></textarea>
+                                    </div>
+                                    <button type="submit" className="btn btn-primary w-100 py-2 rounded-pill fw-bold hover-lift shadow-sm d-flex align-items-center justify-content-center" disabled={submitting}>
+                                        {submitting ? <span className="spinner-border spinner-border-sm me-2"></span> : <i className="bi bi-send-fill me-2"></i>}
+                                        {submitting ? 'Submitting...' : 'Submit Complaint'}
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 <div className="col-lg-7">

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api, { getAuthHeaders } from '../../api/axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const HostelBooking = ({ user }) => {
+    // ... hooks remain same
     const location = useLocation();
     const navigate = useNavigate();
     const preSelected = location.state || {};
@@ -31,12 +32,10 @@ const HostelBooking = ({ user }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const token = await user.getIdToken();
-                // Fetch latest profile details from server
-                const userRes = await axios.post('http://localhost:5000/api/users', {}, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const headers = await getAuthHeaders(user);
                 
+                // Fetch latest profile details from server
+                const userRes = await api.post('/api/users', {}, headers);
                 const serverUser = userRes.data.user;
                 
                 setBookingData(prev => ({
@@ -50,9 +49,7 @@ const HostelBooking = ({ user }) => {
                     address: serverUser.address || ''
                 }));
 
-                const bookingRes = await axios.get('http://localhost:5000/api/bookings/my', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const bookingRes = await api.get('/api/bookings/my', headers);
                 
                 let currentStatus = bookingRes.data;
                 // CRITICAL FIX: Ensure residency warning works even if Booking record is missing
@@ -80,15 +77,11 @@ const HostelBooking = ({ user }) => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const token = await user.getIdToken();
-            await axios.post('http://localhost:5000/api/bookings', bookingData, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const headers = await getAuthHeaders(user);
+            await api.post('/api/bookings', bookingData, headers);
             alert("Application submitted successfully!");
             // Refresh to show status
-            const bookingRes = await axios.get('http://localhost:5000/api/bookings/my', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const bookingRes = await api.get('/api/bookings/my', headers);
             setStatus(bookingRes.data);
         } catch (err) {
             alert(err.response?.data?.message || "Error submitting application");
@@ -96,6 +89,7 @@ const HostelBooking = ({ user }) => {
             setSubmitting(false);
         }
     };
+
 
     if (loading) return <div className="text-center py-5"><div className="spinner-border text-primary"></div></div>;
 

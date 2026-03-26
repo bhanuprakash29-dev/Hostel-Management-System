@@ -4,7 +4,7 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
 });
 
-// Helper to get token and set headers
+// Helper to get token and set headers for any request
 export const getAuthHeaders = async (user) => {
     if (!user) return {};
     const token = await user.getIdToken();
@@ -14,3 +14,4 @@ export const getAuthHeaders = async (user) => {
 };
 
 export default api;
+

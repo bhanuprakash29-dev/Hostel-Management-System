@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api, { getAuthHeaders } from "../api/axios";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -22,19 +22,15 @@ const Dashboard = ({ user }) => {
     useEffect(() => {
         if (user) {
             // 1. Test backend connection
-            axios.get('http://localhost:5000/api/test')
+            api.get('/api/test')
                 .then(res => setBackendMessage(res.data.message))
-                .catch(err => setBackendMessage("Backend connection failed. Make sure server is running on port 5000."));
+                .catch(err => setBackendMessage("Backend connection failed. Make sure server is running."));
 
             // 2. Sync user with MongoDB
             const syncUser = async () => {
                 try {
-                    const token = await user.getIdToken();
-                    const response = await axios.post('http://localhost:5000/api/users', {}, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
+                    const headers = await getAuthHeaders(user);
+                    const response = await api.post('/api/users', {}, headers);
                     setDbSyncStatus(response.data.message);
                     // Extract role from backend response
                     setRole(response.data.user.role);

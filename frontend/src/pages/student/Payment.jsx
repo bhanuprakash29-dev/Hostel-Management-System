@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api, { getAuthHeaders } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 
 const Payment = ({ user }) => {
@@ -11,14 +11,10 @@ const Payment = ({ user }) => {
     useEffect(() => {
         const fetchStatus = async () => {
             try {
-                const token = await user.getIdToken();
+                const headers = await getAuthHeaders(user);
                 const [bookingRes, userRes] = await Promise.all([
-                    axios.get('http://localhost:5000/api/bookings/my', {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    }),
-                    axios.post('http://localhost:5000/api/users', {}, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    })
+                    api.get('/api/bookings/my', headers),
+                    api.post('/api/users', {}, headers)
                 ]);
                 
                 let currentBooking = bookingRes.data;
@@ -48,13 +44,11 @@ const Payment = ({ user }) => {
         e.preventDefault();
         setPaying(true);
         try {
-            const token = await user.getIdToken();
+            const headers = await getAuthHeaders(user);
             // Simulate payment delay
             await new Promise(resolve => setTimeout(resolve, 2000));
             
-            await axios.put('http://localhost:5000/api/users/payment', {}, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            await api.put('/api/users/payment', {}, headers);
             
             navigate('/student/receipt');
         } catch (err) {
@@ -63,6 +57,7 @@ const Payment = ({ user }) => {
             setPaying(false);
         }
     };
+
 
     if (loading) return <div className="text-center py-5"><div className="spinner-border text-primary"></div></div>;
 
@@ -134,65 +129,81 @@ const Payment = ({ user }) => {
     }
 
     return (
-        <div className="container py-5 animate__animated animate__fadeIn">
+        <div className="animate-fade-in py-5">
             <div className="row justify-content-center">
-                <div className="col-md-6">
-                    <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
-                        <div className="bg-primary p-4 text-white text-center">
-                            <h4 className="fw-bold mb-0">Elite Hostel Payment</h4>
-                            <p className="mb-0 small opacity-75">Secure Checkout</p>
+                <div className="col-md-6 col-lg-5">
+                    <div className="premium-card overflow-hidden bg-white shadow-2xl">
+                        <div className="bg-primary p-5 text-white text-center position-relative">
+                            <div className="position-absolute top-0 start-0 w-100 h-100 opacity-10 pointer-events-none">
+                                <i className="bi bi-shield-lock-fill position-absolute" style={{right: '-10%', bottom: '-10%', fontSize: '8rem'}}></i>
+                            </div>
+                            <h3 className="fw-800 mb-2">Secure Checkout</h3>
+                            <p className="mb-0 small opacity-75 fw-bold text-uppercase" style={{letterSpacing: '1px'}}>Elite Hostel Annual Fees</p>
                         </div>
-                        <div className="card-body p-4">
-                            <div className="mb-4 text-center">
-                                <h2 className="fw-bold mb-1">₹ {booking.amount?.toLocaleString() || '0'}</h2>
-                                <p className="text-muted small">Total Annual Hostel Fee</p>
+                        <div className="card-body p-4 p-lg-5">
+                            <div className="mb-5 text-center">
+                                <h1 className="display-4 fw-800 mb-1 text-dark">₹ {booking.amount?.toLocaleString() || '0'}</h1>
+                                <span className="status-badge status-pending px-3 py-1">PAYMENT PENDING</span>
                             </div>
 
-                            <div className="bg-light p-3 rounded-4 mb-4">
-                                <div className="d-flex justify-content-between small mb-2">
-                                    <span className="text-muted">Hostel & Room:</span>
-                                    <span className="fw-bold">{booking.hostelPreference} - Room {booking.roomNumber}</span>
+                            <div className="bg-light p-4 rounded-4 mb-5 border border-dark border-opacity-5">
+                                <div className="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom border-dark border-opacity-10">
+                                    <span className="text-muted small fw-bold text-uppercase">Allocation Details</span>
+                                    <i className="bi bi-info-circle text-primary"></i>
                                 </div>
-                                <div className="d-flex justify-content-between small">
-                                    <span className="text-muted">Category:</span>
-                                    <span className="fw-bold">{booking.roomType}</span>
+                                <div className="d-flex justify-content-between mb-2">
+                                    <span className="text-muted small">Hostel & Block:</span>
+                                    <span className="fw-bold small">{booking.hostelPreference}</span>
+                                </div>
+                                <div className="d-flex justify-content-between mb-2">
+                                    <span className="text-muted small">Assigned Room:</span>
+                                    <span className="fw-bold small">#{booking.roomNumber}</span>
+                                </div>
+                                <div className="d-flex justify-content-between">
+                                    <span className="text-muted small">Room Tier:</span>
+                                    <span className="fw-bold small">{booking.roomType}</span>
                                 </div>
                             </div>
 
                             <form onSubmit={handlePayment}>
-                                <div className="mb-3">
-                                    <label className="form-label small fw-bold">Card Number</label>
-                                    <div className="input-group mb-3">
-                                        <span className="input-group-text bg-white border-end-0"><i className="bi bi-credit-card"></i></span>
-                                        <input type="text" className="form-control border-start-0" placeholder="XXXX XXXX XXXX XXXX" required />
+                                <div className="mb-4">
+                                    <label className="form-label ms-1 small fw-bold text-muted text-uppercase mb-2" style={{letterSpacing: '0.5px'}}>Card Information</label>
+                                    <div className="input-group">
+                                        <span className="input-group-text bg-light border-0 px-3 rounded-start-pill"><i className="bi bi-credit-card-2-back-fill text-muted"></i></span>
+                                        <input type="text" className="form-control border-0 bg-light py-3 px-3 shadow-none fw-bold" placeholder="Card Number" required />
                                     </div>
                                 </div>
-                                <div className="row mb-4">
+                                <div className="row g-3 mb-5">
                                     <div className="col-6">
-                                        <label className="form-label small fw-bold">Expiry</label>
-                                        <input type="text" className="form-control" placeholder="MM/YY" required />
+                                        <div className="input-group">
+                                            <input type="text" className="form-control border-0 bg-light py-3 px-3 rounded-pill shadow-none fw-bold text-center" placeholder="MM/YY" required />
+                                        </div>
                                     </div>
                                     <div className="col-6">
-                                        <label className="form-label small fw-bold">CVV</label>
-                                        <input type="text" className="form-control" placeholder="123" required />
+                                        <div className="input-group">
+                                            <input type="text" className="form-control border-0 bg-light py-3 px-3 rounded-pill shadow-none fw-bold text-center" placeholder="CVV" required />
+                                        </div>
                                     </div>
                                 </div>
-                                <button type="submit" className="btn btn-primary w-100 py-3 rounded-pill fw-bold" disabled={paying}>
+                                <button type="submit" className="btn btn-premium btn-premium-primary w-100 py-3 shadow-lg fs-5" disabled={paying}>
                                     {paying ? (
-                                        <><span className="spinner-border spinner-border-sm me-2"></span>Processing...</>
-                                    ) : 'Pay Now & Generate Receipt'}
+                                        <><span className="spinner-border spinner-border-sm me-3"></span>Processing...</>
+                                    ) : 'Complete Secure Payment'}
                                 </button>
                             </form>
                         </div>
-                        <div className="card-footer bg-white border-0 text-center pb-4">
-                            <i className="bi bi-shield-lock text-success me-2"></i>
-                            <span className="small text-muted">256-bit SSL Encrypted Payment</span>
+                        <div className="card-footer bg-light border-0 text-center py-4 d-flex align-items-center justify-content-center gap-3">
+                            <img src="https://cdn-icons-png.flaticon.com/512/349/349221.png" height="20" alt="Visa" className="grayscale opacity-50" />
+                            <img src="https://cdn-icons-png.flaticon.com/512/349/349228.png" height="20" alt="MasterCard" className="grayscale opacity-50" />
+                            <div className="vr h-20px opacity-25 mx-1"></div>
+                            <span className="small text-muted fw-bold" style={{fontSize: '0.65rem'}}><i className="bi bi-shield-check me-1 fs-6"></i> PCI-DSS COMPLIANT</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     );
+
 };
 
 export default Payment;

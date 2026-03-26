@@ -1,126 +1,143 @@
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
+
+  // ... (rest of the functions remain same)
+  // (I will use replace_file_content to target the specific block)
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
+    setIsEmailLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message);
+      if (err.code === 'auth/wrong-password') {
+        setError("The password you entered is incorrect. Please try again.");
+      } else if (err.code === 'auth/user-not-found') {
+        setError("No account found with this email. Please register first.");
+      } else if (err.code === 'auth/account-exists-with-different-credential') {
+        setError("This account is linked with Google. Please use 'Sign in with Google'.");
+      } else {
+        setError(err.message);
+      }
     } finally {
-      setLoading(false);
+
+      setIsEmailLoading(false);
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setError("");
+    setIsGoogleLoading(true);
+    try {
+      await signInWithPopup(auth, googleProvider);
+      navigate("/dashboard");
+    } catch (err) {
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError(err.message);
+      }
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+
   return (
-    <div className="auth-wrapper">
-      <div className="auth-split-bg d-none d-lg-flex flex-column align-items-start position-relative">
-        <div className="position-relative z-index-1 mb-5">
-            <Link to="/" className="text-white text-decoration-none d-flex align-items-center fw-bold fs-5">
-              <i className="bi bi-building me-2"></i> Elite Hostel
-            </Link>
-        </div>
-        
-        <div className="position-relative z-index-1 flex-grow-1 d-flex flex-column justify-content-center">
-          <h1 className="display-4 fw-bolder mb-4 lh-base">Welcome Back.<br/>Manage Your Stay.</h1>
-          <p className="lead opacity-75 mb-5" style={{ maxWidth: '400px' }}>
-            Access your dashboard to check notifications, track your hostel payments, and manage access cards.
-          </p>
-          
-          <div className="bg-white bg-opacity-10 p-4 rounded-4 backdrop-blur mt-auto mb-5 d-inline-block border border-white border-opacity-25" style={{ maxWidth: '400px' }}>
-            <div className="d-flex align-items-start gap-3">
-              <i className="bi bi-quote fs-1 text-warning opacity-50"></i>
-              <div>
-                <p className="fst-italic mb-3">"The digital access cards and app notifications make living here incredibly easy. Everything is just a tap away."</p>
-                <div className="d-flex align-items-center gap-2">
-                  <div className="rounded-circle border" style={{width: 30, height: 30, backgroundImage: 'url(https://i.pravatar.cc/100?img=5)', backgroundSize: 'cover'}}></div>
-                  <small className="fw-bold">Rohit Sharma, 3rd Year CE</small>
+    <div className="auth-wrapper animate-fade-in">
+        <div className="auth-card border-0 shadow-lg">
+            <div className="text-center mb-5">
+                <div className="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded-circle mb-4" style={{ width: '64px', height: '64px' }}>
+                    <i className="bi bi-shield-lock text-primary fs-3"></i>
                 </div>
-              </div>
+                <h2 className="fw-800 text-dark mb-2">Member Portal</h2>
+                <p className="text-secondary small fw-500">Sign in to manage your residency</p>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="auth-form-container">
-        <div className="auth-card">
-          <div className="mb-5 d-lg-none text-center">
-             <Link to="/" className="text-primary text-decoration-none d-inline-flex align-items-center fw-bold fs-4">
-              <i className="bi bi-building me-2"></i> Elite Hostel
-            </Link>
-          </div>
-          
-          <div className="mb-4">
-            <h2 className="fw-bold text-dark mb-2">Sign In</h2>
-            <p className="text-muted">Enter your email and password to access</p>
-          </div>
+            {error && (
+                <div className="alert border-0 bg-danger bg-opacity-10 text-danger px-4 py-3 mb-4 rounded-3 d-flex align-items-center">
+                    <i className="bi bi-exclamation-triangle-fill me-3 fs-5"></i>
+                    <div className="small fw-700">{error}</div>
+                </div>
+            )}
 
-          {error && (
-            <div className="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger rounded-4 d-flex align-items-center small mb-4">
-              <i className="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-              <div>{error}</div>
-            </div>
-          )}
+            <form onSubmit={handleLogin}>
+                <div className="mb-4">
+                    <label className="form-label small fw-800 text-muted text-uppercase mb-2" style={{ letterSpacing: '0.5px' }}>Email Address</label>
+                    <input
+                        type="email"
+                        className="form-input-decent shadow-none"
+                        placeholder="yourname@hostel.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                
+                <div className="mb-4">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                        <label className="form-label small fw-800 text-muted text-uppercase mb-0" style={{ letterSpacing: '0.5px' }}>Security Key</label>
+                        <Link to="/forgot-password" title="Recover Account" className="small text-primary text-decoration-none fw-700">Forgot Password?</Link>
+                    </div>
+                    <div className="position-relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            className="form-input-decent shadow-none"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                        <button 
+                            type="button"
+                            className="btn position-absolute top-50 end-0 translate-middle-y border-0 text-muted px-3"
+                            onClick={() => setShowPassword(!showPassword)}
+                            style={{ background: 'transparent' }}
+                        >
+                            <i className={`bi ${showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" className="btn btn-primary w-100 py-3 fs-6 mb-4 fw-700 shadow-sm" disabled={isEmailLoading || isGoogleLoading}>
+                    {isEmailLoading ? 'Verifying...' : 'Access My Dashboard'}
+                </button>
 
-          <form onSubmit={handleLogin}>
-            <div className="mb-4">
-              <label className="form-label small fw-bold text-muted ms-1 mb-2">Email Address</label>
-              <div className="input-group">
-                <span className="input-group-text bg-light border-0 px-3 rounded-start-pill"><i className="bi bi-envelope text-muted"></i></span>
-                <input
-                  type="email"
-                  className="form-control border-0 bg-light rounded-end-pill py-3 px-3 shadow-none"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
+                <div className="d-flex align-items-center my-4">
+                    <hr className="flex-grow-1 opacity-25" />
+                    <span className="mx-3 text-muted small fw-800 text-uppercase" style={{fontSize: '9px', letterSpacing: '1px'}}>One-Tap Social Entry</span>
+                    <hr className="flex-grow-1 opacity-25" />
+                </div>
+
+                <button 
+                    type="button" 
+                    onClick={handleGoogleSignIn}
+                    className="btn btn-white border w-100 py-2 shadow-sm mb-4 d-flex align-items-center justify-content-center gap-3 rounded-3"
+                    disabled={isEmailLoading || isGoogleLoading}
+                >
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google" />
+                    <span className="fw-700 text-dark small">Continue with Google</span>
+                </button>
+            </form>
             
-            <div className="mb-5">
-              <div className="d-flex justify-content-between align-items-center mb-2 ms-1">
-                <label className="form-label small fw-bold text-muted mb-0">Password</label>
-                <a href="#" className="small text-primary text-decoration-none" onClick={(e) => e.preventDefault()}>Forgot Password?</a>
-              </div>
-              <div className="input-group">
-                <span className="input-group-text bg-light border-0 px-3 rounded-start-pill"><i className="bi bi-lock text-muted"></i></span>
-                <input
-                  type="password"
-                  className="form-control border-0 bg-light rounded-end-pill py-3 px-3 shadow-none"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
+            <div className="text-center pt-3 mt-2 border-top">
+                <p className="text-secondary small mb-0">
+                    Not a member? <Link to="/sign-up" className="text-primary fw-800 text-decoration-none ms-1">Apply Now &rarr;</Link>
+                </p>
             </div>
-            
-            <button type="submit" className="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow-lg hover-lift mb-4 d-flex align-items-center justify-content-center" disabled={loading}>
-              {loading ? <span className="spinner-border spinner-border-sm me-2"></span> : null}
-              {loading ? 'Authenticating...' : 'Sign In'}
-            </button>
-          </form>
-          
-          <div className="text-center">
-            <p className="text-muted small mb-0">
-              New here? <Link to="/sign-up" className="text-primary fw-bold text-decoration-none ms-1">Create an account</Link>
-            </p>
-          </div>
         </div>
-      </div>
     </div>
   );
 };

@@ -1,100 +1,101 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
-const Sidebar = ({ role }) => {
+const Sidebar = ({ role, show, onClose }) => {
     return (
-        <div className="sidebar d-flex flex-column p-3">
-            <div className="text-center mb-4">
-                <h4 className="text-white fw-bold">HMS Portal</h4>
-                <hr className="text-white opacity-25" />
+        <aside className={`sidebar ${show ? 'show' : ''} border-end`}>
+            <div className="sidebar-logo mb-4">
+                <Link to="/" className="text-white text-decoration-none fw-800 fs-4 d-flex align-items-center">
+                    <i className="bi bi-building me-2"></i> HMS
+                </Link>
+                <button className="btn d-lg-none ms-auto text-white" aria-label="Close sidebar" onClick={onClose}>
+                    <i className="bi bi-x-large"></i>
+                </button>
             </div>
             
-            <nav className="nav flex-column flex-grow-1">
+            <nav className="sidebar-nav">
+                <div className="text-muted small fw-bold text-uppercase px-2 mb-3 opacity-50" style={{ fontSize: '10px' }}>Management</div>
                 {role === 'admin' ? (
                     <>
-                        <NavLink to="/admin/dashboard" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-speedometer2 me-3 fs-5"></i>
-                            <span>Admin Home</span>
+                        <NavLink to="/admin/dashboard" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
                         </NavLink>
-                        <NavLink to="/admin/applications" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-file-earmark-text me-3 fs-5"></i>
+                        <NavLink to="/admin/applications" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-journal-text"></i>
                             <span>Applications</span>
                         </NavLink>
-                        <NavLink to="/admin/room-management" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-door-closed me-3 fs-5"></i>
-                            <span>Room Management</span>
+                        <NavLink to="/admin/room-management" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-layout-text-sidebar-reverse"></i>
+                            <span>Rooms</span>
                         </NavLink>
-                        <NavLink to="/admin/student-management" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-people-fill me-3 fs-5"></i>
-                            <span>Student Records</span>
+                        <NavLink to="/admin/student-management" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-people"></i>
+                            <span>Students</span>
                         </NavLink>
-                        <NavLink to="/admin/notices" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-megaphone me-3 fs-5"></i>
-                            <span>Notice Board</span>
+                        <NavLink to="/admin/notices" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-megaphone"></i>
+                            <span>Notices</span>
                         </NavLink>
-                        <NavLink to="/admin/complaints" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-headset me-3 fs-5"></i>
+                        <NavLink to="/admin/complaints" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-chat-left-dots"></i>
                             <span>Complaints</span>
                         </NavLink>
-                        <NavLink to="/admin/achievements" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-award me-3 fs-5 text-warning"></i>
-                            <span>Achievements</span>
-                        </NavLink>
-                        <NavLink to="/admin/profile" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-person-gear me-3 fs-5"></i>
-                            <span>Admin Profile</span>
+                        <NavLink to="/admin/profile" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-gear"></i>
+                            <span>Settings</span>
                         </NavLink>
                     </>
                 ) : (
                     <>
-                        <NavLink to="/student/dashboard" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-house-door me-3 fs-5"></i>
-                            <span>Student Home</span>
+                        <NavLink to="/student/dashboard" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-house"></i>
+                            <span>Home</span>
                         </NavLink>
-                        <NavLink to="/student/booking" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-journal-plus me-3 fs-5"></i>
-                            <span>Apply for Hostel</span>
+                        <NavLink to="/student/booking" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-plus-circle"></i>
+                            <span>Apply Seat</span>
                         </NavLink>
-                        <NavLink to="/student/booking-rooms" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-door-open me-3 fs-5"></i>
+                        <NavLink to="/student/booking-rooms" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-eye"></i>
                             <span>View Rooms</span>
                         </NavLink>
-                        <NavLink to="/student/room-chat" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-chat-right-text me-3 fs-5 text-success"></i>
+                        <NavLink to="/student/room-chat" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-chat-dots"></i>
                             <span>Room Chat</span>
                         </NavLink>
-                        <NavLink to="/student/mess-menu" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-egg-fried me-3 fs-5"></i>
+                        <NavLink to="/student/mess-menu" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-cup-hot"></i>
                             <span>Mess Menu</span>
                         </NavLink>
-                        <NavLink to="/student/info" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-info-circle me-3 fs-5"></i>
-                            <span>Hostel Info</span>
+                        <NavLink to="/student/notices" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-bell"></i>
+                            <span>Updates</span>
                         </NavLink>
-                        <NavLink to="/student/complaints" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-headset me-3 fs-5 text-info"></i>
-                            <span>Help & Support</span>
+                        <NavLink to="/student/complaints" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-headset"></i>
+                            <span>Support</span>
                         </NavLink>
-                        <NavLink to="/student/achievements" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-award me-3 fs-5 text-warning"></i>
-                            <span>Achievements</span>
-                        </NavLink>
-                        <NavLink to="/student/profile" className="nav-link d-flex align-items-center mb-2 rounded shadow-sm">
-                            <i className="bi bi-person-circle me-3 fs-5"></i>
+                        <NavLink to="/student/profile" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-person"></i>
                             <span>My Profile</span>
                         </NavLink>
                     </>
                 )}
             </nav>
             
-            <div className="mt-auto pt-3 border-top border-secondary border-opacity-25">
+            <div className="mt-auto pt-4 border-top opacity-75">
                 <div className="d-flex align-items-center px-2">
-                    <div className="bg-primary rounded-circle p-2 me-2">
-                        <i className="bi bi-shield-lock text-white"></i>
+                    <div className="text-secondary p-1 me-2 border rounded-3 bg-light opacity-50" style={{ width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className={`bi ${role === 'admin' ? 'bi-shield-check' : 'bi-person-badge'} fs-6`}></i>
                     </div>
-                    <small className="text-white-50">Role: {(role || 'User').toUpperCase()}</small>
+                    <div>
+                        <div className="small fw-700 text-white opacity-50 uppercase" style={{ fontSize: '9px' }}>Log In Role</div>
+                        <div className="small text-white fw-bold">{(role || 'Resident')}</div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </aside>
+
     );
 };
 

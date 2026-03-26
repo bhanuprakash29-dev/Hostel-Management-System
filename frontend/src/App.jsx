@@ -9,6 +9,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 
 // Student Pages
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -99,6 +100,7 @@ function App() {
         <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <><Navbar user={user} /><Home user={user} /></>} />
         <Route path="/sign-in" element={!user ? <Login /> : getDashboardRedirect()} />
         <Route path="/sign-up" element={!user ? <Register /> : getDashboardRedirect()} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify/:uid" element={<VerifyCard />} />
 
         {/* --- STUDENT ROUTES --- */}

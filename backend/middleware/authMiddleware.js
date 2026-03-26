@@ -14,19 +14,32 @@ const verifyToken = async (req, res, next) => {
         const decodedToken = await admin.auth().verifyIdToken(token);
         const { uid, email, name } = decodedToken;
 
+        // Try finding by UID first
         let user = await User.findOne({ firebaseUID: uid });
 
-        // If user doesn't exist in MongoDB, create it (Requirement 3)
+        // If not found by UID, try finding by email (to link multiple providers like Email/Google)
+        if (!user && email) {
+            user = await User.findOne({ email });
+            if (user) {
+                // Link the new Firebase UID to this existing MongoDB user
+                user.firebaseUID = uid;
+                await user.save();
+                console.log(`Linked existing user ${email} to new Firebase UID: ${uid}`);
+            }
+        }
+
+        // If user still doesn't exist, create it
         if (!user) {
             user = new User({
                 firebaseUID: uid,
                 email,
-                name: name || email.split('@')[0], // Use name from token or fallback to email prefix
-                role: 'student' // Default to student
+                name: name || email.split('@')[0], 
+                role: 'student'
             });
             await user.save();
             console.log(`New user created in MongoDB: ${email}`);
         }
+
 
         // Attach user to request object (Requirement 4)
         req.user = user;

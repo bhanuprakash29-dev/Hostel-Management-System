@@ -1,0 +1,28 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: hms-backend
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    rootDir: backend
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false # Set this in Render dashboard
+      # Add other ENVs like FIREBASE_... here
+
+  # Frontend Static Site
+  - type: static
+    name: hms-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: hms-backend
+          property: host

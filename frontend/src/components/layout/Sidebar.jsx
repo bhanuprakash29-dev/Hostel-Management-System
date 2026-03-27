@@ -40,6 +40,10 @@ const Sidebar = ({ role, show, onClose }) => {
                             <i className="bi bi-chat-left-dots"></i>
                             <span>Complaints</span>
                         </NavLink>
+                        <NavLink to="/admin/achievements" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-award"></i>
+                            <span>Achievements</span>
+                        </NavLink>
                         <NavLink to="/admin/profile" className="nav-link" onClick={onClose}>
                             <i className="bi bi-gear"></i>
                             <span>Settings</span>
@@ -74,6 +78,10 @@ const Sidebar = ({ role, show, onClose }) => {
                         <NavLink to="/student/complaints" className="nav-link" onClick={onClose}>
                             <i className="bi bi-headset"></i>
                             <span>Support</span>
+                        </NavLink>
+                        <NavLink to="/student/achievements" className="nav-link" onClick={onClose}>
+                            <i className="bi bi-award"></i>
+                            <span>Achievements</span>
                         </NavLink>
                         <NavLink to="/student/profile" className="nav-link" onClick={onClose}>
                             <i className="bi bi-person"></i>

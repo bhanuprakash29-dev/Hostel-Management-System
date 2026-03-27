@@ -5,3 +5,11 @@ node_modules
 backend/serviceAccountKey.json
 frontend/dist
 backend/uploads
+backend/diagnostic_data.json
+backend/inspect_*.js
+backend/check_dups.js
+backend/makeAdmin.js
+backend/seed*.js
+backend/*.json
+!backend/package.json
+!backend/package-lock.json

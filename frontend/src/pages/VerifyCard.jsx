@@ -10,7 +10,7 @@ const VerifyCard = () => {
     useEffect(() => {
         const verifyStudent = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/public/verify/${uid}`);
+                const res = await axios.get(`https://hostel-management-system-11.onrender.com/api/public/verify/${uid}`);
                 setData(res.data);
                 setStatus('success');
             } catch (err) {

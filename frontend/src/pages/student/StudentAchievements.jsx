@@ -15,7 +15,7 @@ const StudentAchievements = ({ user }) => {
     const fetchData = async () => {
         try {
             const token = await user.getIdToken();
-            const res = await axios.get('http://localhost:5000/api/achievements/my', {
+            const res = await axios.get('https://hostel-management-system-11.onrender.com/api/achievements/my', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAchievements(res.data);
@@ -36,7 +36,7 @@ const StudentAchievements = ({ user }) => {
             formData.append('category', form.category);
             if (file) formData.append('proofFile', file);
 
-            await axios.post('http://localhost:5000/api/achievements', formData, {
+            await axios.post('https://hostel-management-system-11.onrender.com/api/achievements', formData, {
                 headers: { 
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'

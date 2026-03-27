@@ -9,7 +9,7 @@ const MessMenu = ({ user }) => {
         const fetchMenu = async () => {
             try {
                 const token = await user.getIdToken();
-                const res = await axios.get('http://localhost:5000/api/mess/menu', {
+                const res = await axios.get('https://hostel-management-system-11.onrender.com/api/mess/menu', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setMenu(res.data);

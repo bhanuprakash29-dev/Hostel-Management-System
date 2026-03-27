@@ -802,7 +802,7 @@ app.post('/api/achievements', verifyToken, upload.single('proofFile'), async (re
     try {
         let proofUrl = req.body.proofUrl || '';
         if (req.file) {
-            const baseUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+            const baseUrl = process.env.BACKEND_URL || 'https://hostel-management-system-11.onrender.com';
             proofUrl = `${baseUrl}/uploads/${req.file.filename}`;
         }
         

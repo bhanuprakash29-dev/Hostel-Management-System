@@ -11,7 +11,7 @@ const Receipt = ({ user }) => {
         const fetchUserData = async () => {
             try {
                 const token = await user.getIdToken();
-                const res = await axios.post('http://localhost:5000/api/users', {}, {
+                const res = await axios.post('https://hostel-management-system-11.onrender.com/api/users', {}, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setServerUser(res.data.user);

@@ -19,13 +19,13 @@ const StudentComplaints = () => {
     const fetchComplaints = async () => {
         try {
             const token = await auth.currentUser.getIdToken();
-            const res = await axios.get('http://localhost:5000/api/complaints/my', {
+            const res = await axios.get('https://hostel-management-system-11.onrender.com/api/complaints/my', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setComplaints(res.data);
 
             // Fetch latest user profile to check room assignment
-            const userRes = await axios.post('http://localhost:5000/api/users', {}, {
+            const userRes = await axios.post('https://hostel-management-system-11.onrender.com/api/users', {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const userData = userRes.data.user;
@@ -43,7 +43,7 @@ const StudentComplaints = () => {
         setSubmitting(true);
         try {
             const token = await auth.currentUser.getIdToken();
-            const res = await axios.post('http://localhost:5000/api/complaints', { title, description }, {
+            const res = await axios.post('https://hostel-management-system-11.onrender.com/api/complaints', { title, description }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessage({ text: res.data.message, type: 'success' });

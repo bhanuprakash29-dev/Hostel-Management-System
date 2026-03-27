@@ -25,10 +25,10 @@ const RoomManagement = ({ user }) => {
         try {
             const token = await user.getIdToken();
             const [roomsRes, appsRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/admin/rooms', {
+                axios.get('https://hostel-management-system-11.onrender.com/api/admin/rooms', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }),
-                axios.get('http://localhost:5000/api/admin/bookings/all', {
+                axios.get('https://hostel-management-system-11.onrender.com/api/admin/bookings/all', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 })
             ]);
@@ -46,7 +46,7 @@ const RoomManagement = ({ user }) => {
         setIssuingCard(userId);
         try {
             const token = await user.getIdToken();
-            await axios.put(`http://localhost:5000/api/admin/issue-access-card/${userId}`, { roomNumber }, {
+            await axios.put(`https://hostel-management-system-11.onrender.com/api/admin/issue-access-card/${userId}`, { roomNumber }, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             fetchData();
@@ -73,7 +73,7 @@ const RoomManagement = ({ user }) => {
         e.preventDefault();
         try {
             const token = await user.getIdToken();
-            await axios.post('http://localhost:5000/api/admin/rooms', newRoom, {
+            await axios.post('https://hostel-management-system-11.onrender.com/api/admin/rooms', newRoom, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             setShowAddModal(false);
@@ -92,7 +92,7 @@ const RoomManagement = ({ user }) => {
     const handleAddBed = async (roomId) => {
         try {
             const token = await user.getIdToken();
-            const res = await axios.put(`http://localhost:5000/api/admin/rooms/${roomId}/add-bed`, {}, {
+            const res = await axios.put(`https://hostel-management-system-11.onrender.com/api/admin/rooms/${roomId}/add-bed`, {}, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             // Update local state for immediate feedback
@@ -105,7 +105,7 @@ const RoomManagement = ({ user }) => {
     const handleRemoveBed = async (roomId) => {
         try {
             const token = await user.getIdToken();
-            const res = await axios.put(`http://localhost:5000/api/admin/rooms/${roomId}/remove-bed`, {}, {
+            const res = await axios.put(`https://hostel-management-system-11.onrender.com/api/admin/rooms/${roomId}/remove-bed`, {}, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             setRooms(rooms.map(r => r._id === roomId ? res.data.room : r));

@@ -15,7 +15,7 @@ const ManageStudents = ({ user }) => {
     const fetchStudents = async () => {
         try {
             const token = await user.getIdToken();
-            const res = await axios.get('http://localhost:5000/api/admin/users', {
+            const res = await axios.get('https://hostel-management-system-11.onrender.com/api/admin/users', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             setStudents(res.data);
@@ -31,7 +31,7 @@ const ManageStudents = ({ user }) => {
         setUpdating(id);
         try {
             const token = await user.getIdToken();
-            await axios.put(`http://localhost:5000/api/admin/users/${id}/deallocate`, {}, {
+            await axios.put(`https://hostel-management-system-11.onrender.com/api/admin/users/${id}/deallocate`, {}, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             fetchStudents();
@@ -47,7 +47,7 @@ const ManageStudents = ({ user }) => {
         setUpdating(id);
         try {
             const token = await user.getIdToken();
-            await axios.delete(`http://localhost:5000/api/admin/users/${id}`, {
+            await axios.delete(`https://hostel-management-system-11.onrender.com/api/admin/users/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             fetchStudents();

@@ -13,7 +13,7 @@ const ManageNotices = ({ user }) => {
     const fetchNotices = async () => {
         try {
             const token = await user.getIdToken();
-            const res = await axios.get('http://localhost:5000/api/notices', {
+            const res = await axios.get('https://hostel-management-system-11.onrender.com/api/notices', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             setNotices(res.data);
@@ -28,7 +28,7 @@ const ManageNotices = ({ user }) => {
         e.preventDefault();
         try {
             const token = await user.getIdToken();
-            await axios.post('http://localhost:5000/api/admin/notices', newNotice, {
+            await axios.post('https://hostel-management-system-11.onrender.com/api/admin/notices', newNotice, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             setNewNotice({ title: "", content: "", category: "Update" });

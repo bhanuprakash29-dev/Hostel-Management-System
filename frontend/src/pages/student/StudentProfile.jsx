@@ -21,13 +21,13 @@ const StudentProfile = ({ user }) => {
             try {
                 const token = await user.getIdToken();
                 // Fetch booking
-                const bookingRes = await axios.get('http://localhost:5000/api/bookings/my', {
+                const bookingRes = await axios.get('https://hostel-management-system-11.onrender.com/api/bookings/my', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 setBooking(bookingRes.data);
                 
                 // Fetch latest user data (for profile sync)
-                const userRes = await axios.post('http://localhost:5000/api/users', {}, {
+                const userRes = await axios.post('https://hostel-management-system-11.onrender.com/api/users', {}, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const userData = userRes.data.user;
@@ -55,7 +55,7 @@ const StudentProfile = ({ user }) => {
         setMessage({ type: '', text: '' });
         try {
             const token = await user.getIdToken();
-            await axios.put('http://localhost:5000/api/users/profile', profile, {
+            await axios.put('https://hostel-management-system-11.onrender.com/api/users/profile', profile, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             setMessage({ type: 'success', text: 'Profile updated successfully! Refreshing...' });

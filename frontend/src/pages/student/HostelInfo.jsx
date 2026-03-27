@@ -8,7 +8,7 @@ const HostelInfo = ({ user }) => {
         const fetchAchievements = async () => {
             try {
                 const token = await user.getIdToken();
-                const res = await axios.get('http://localhost:5000/api/achievements/approved', {
+                const res = await axios.get('https://hostel-management-system-11.onrender.com/api/achievements/approved', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setAchievements(res.data);

@@ -15,7 +15,7 @@ const ManageApplications = ({ user }) => {
     const fetchApplications = async () => {
         try {
             const token = await user.getIdToken();
-            const res = await axios.get('http://localhost:5000/api/admin/bookings/all', {
+            const res = await axios.get('https://hostel-management-system-11.onrender.com/api/admin/bookings/all', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const apps = Array.isArray(res.data) ? res.data : [];
@@ -42,7 +42,7 @@ const ManageApplications = ({ user }) => {
         setUpdating(id);
         try {
             const token = await user.getIdToken();
-            await axios.put(`http://localhost:5000/api/admin/bookings/${id}`, { status }, {
+            await axios.put(`https://hostel-management-system-11.onrender.com/api/admin/bookings/${id}`, { status }, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (selectedApp) setSelectedApp(null);
@@ -60,7 +60,7 @@ const ManageApplications = ({ user }) => {
         setUpdating(id);
         try {
             const token = await user.getIdToken();
-            await axios.delete(`http://localhost:5000/api/admin/bookings/${id}`, {
+            await axios.delete(`https://hostel-management-system-11.onrender.com/api/admin/bookings/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             fetchApplications();

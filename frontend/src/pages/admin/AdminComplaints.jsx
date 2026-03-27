@@ -15,7 +15,7 @@ const AdminComplaints = () => {
     const fetchComplaints = async () => {
         try {
             const token = await auth.currentUser.getIdToken();
-            const res = await axios.get('http://localhost:5000/api/admin/complaints', {
+            const res = await axios.get('https://hostel-management-system-11.onrender.com/api/admin/complaints', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setComplaints(res.data);
@@ -29,7 +29,7 @@ const AdminComplaints = () => {
     const updateStatus = async (id, newStatus, resolutionNotes = "") => {
         try {
             const token = await auth.currentUser.getIdToken();
-            await axios.put(`http://localhost:5000/api/admin/complaints/${id}`, 
+            await axios.put(`https://hostel-management-system-11.onrender.com/api/admin/complaints/${id}`, 
                 { status: newStatus, resolutionNotes }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );

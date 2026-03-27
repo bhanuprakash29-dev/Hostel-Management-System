@@ -15,7 +15,7 @@ const AdminAchievements = () => {
     const fetchAchievements = async () => {
         try {
             const token = await auth.currentUser.getIdToken();
-            const res = await axios.get('http://localhost:5000/api/admin/achievements', {
+            const res = await axios.get('https://hostel-management-system-11.onrender.com/api/admin/achievements', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAchievements(res.data);
@@ -29,7 +29,7 @@ const AdminAchievements = () => {
     const updateStatus = async (id, newStatus, rejectionReason = "") => {
         try {
             const token = await auth.currentUser.getIdToken();
-            await axios.put(`http://localhost:5000/api/admin/achievements/${id}`, 
+            await axios.put(`https://hostel-management-system-11.onrender.com/api/admin/achievements/${id}`, 
                 { status: newStatus, rejectionReason }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );

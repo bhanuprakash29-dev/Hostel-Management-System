@@ -13,7 +13,7 @@ const StudentNotices = () => {
     const fetchNotices = async () => {
         try {
             const token = await auth.currentUser.getIdToken();
-            const res = await axios.get('http://localhost:5000/api/notices', {
+            const res = await axios.get('https://hostel-management-system-11.onrender.com/api/notices', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotices(res.data);

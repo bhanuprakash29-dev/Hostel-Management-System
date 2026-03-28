@@ -20,7 +20,7 @@ const Register = () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, { displayName: name });
-      navigate("/dashboard");
+      navigate("/verify-email");
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
         setError(
@@ -47,7 +47,7 @@ const Register = () => {
     setIsGoogleLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      navigate("/dashboard");
+      navigate("/verify-email");
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user') {
         setError(err.message);

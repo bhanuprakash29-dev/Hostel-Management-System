@@ -52,6 +52,19 @@ const userSchema = new mongoose.Schema({
         enum: ['Active', 'Inactive', 'Expired'],
         default: 'Inactive'
     },
+    // Email OTP Verification
+    emailVerified: {
+        type: Boolean,
+        default: false
+    },
+    otp: {
+        type: String,
+        default: null
+    },
+    otpExpiresAt: {
+        type: Date,
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now

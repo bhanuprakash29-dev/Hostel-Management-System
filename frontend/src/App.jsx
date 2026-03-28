@@ -27,6 +27,7 @@ import StudentAchievements from './pages/student/StudentAchievements';
 import StudentNotices from './pages/student/StudentNotices';
 import StudentRoomChat from './pages/student/StudentRoomChat';
 import VerifyCard from './pages/VerifyCard';
+import VerifyOtp from './pages/VerifyOtp';
 
 // Admin Pages
 import AdminHome from './pages/admin/AdminHome';
@@ -41,6 +42,7 @@ import ManageStudents from './pages/admin/ManageStudents';
 function App() {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
+  const [emailVerified, setEmailVerified] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,9 +61,13 @@ function App() {
           const normalizedRole = userRole.toLowerCase() === 'admin' ? 'admin' : 'student';
           console.log("Logged in user role:", normalizedRole);
           setRole(normalizedRole);
+          // Check email OTP verification status
+          const verified = response.data?.user?.emailVerified || false;
+          setEmailVerified(verified);
         } catch (err) {
           console.error("Auth sync error:", err);
           setRole('student');
+          setEmailVerified(false);
         }
       } else {
         setRole(null);
@@ -84,6 +90,7 @@ function App() {
   // Redirect logic for home/dashboard
   const getDashboardRedirect = () => {
     if (!user) return <Navigate to="/sign-in" />;
+    if (!emailVerified) return <Navigate to="/verify-email" replace />;
     if (!role) return (
       <div className="d-flex flex-column justify-content-center align-items-center vh-100 bg-light">
         <div className="spinner-border text-primary shadow-sm" style={{width: '3rem', height: '3rem'}}></div>
@@ -102,6 +109,7 @@ function App() {
         <Route path="/sign-up" element={!user ? <Register /> : getDashboardRedirect()} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify/:uid" element={<VerifyCard />} />
+        <Route path="/verify-email" element={user ? <VerifyOtp /> : <Navigate to="/sign-in" />} />
 
         {/* --- STUDENT ROUTES --- */}
         <Route

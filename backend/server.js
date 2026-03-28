@@ -955,6 +955,87 @@ app.post('/api/chats/:roomNumber', verifyToken, async (req, res) => {
     }
 });
 
+
+// ─── EMAIL OTP VERIFICATION ROUTES ───────────────────────────────────────────
+const { sendOtpEmail } = require('./emailService');
+const crypto = require('crypto');
+
+// Generate and send OTP (called after Firebase auth — user must be logged in)
+app.post('/api/otp/send', verifyToken, async (req, res) => {
+    try {
+        const user = req.user;
+
+        // If already verified, no need to re-send
+        if (user.emailVerified) {
+            return res.json({ message: 'Email already verified', alreadyVerified: true });
+        }
+
+        // Generate a 6-digit OTP
+        const otp = crypto.randomInt(100000, 999999).toString();
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+        // Save OTP to user record
+        user.otp = otp;
+        user.otpExpiresAt = otpExpiresAt;
+        await user.save();
+
+        // Send email via Brevo
+        await sendOtpEmail(user.email, user.name, otp);
+
+        res.json({ message: `OTP sent to ${user.email}. Valid for 10 minutes.` });
+    } catch (error) {
+        console.error('OTP send error:', error);
+        res.status(500).json({ message: error.message || 'Failed to send OTP' });
+    }
+});
+
+// Verify OTP submitted by user
+app.post('/api/otp/verify', verifyToken, async (req, res) => {
+    try {
+        const { otp } = req.body;
+        const user = req.user;
+
+        if (!otp) {
+            return res.status(400).json({ message: 'OTP is required' });
+        }
+
+        if (user.emailVerified) {
+            return res.json({ message: 'Email already verified', alreadyVerified: true });
+        }
+
+        if (!user.otp || !user.otpExpiresAt) {
+            return res.status(400).json({ message: 'No OTP found. Please request a new one.' });
+        }
+
+        if (new Date() > user.otpExpiresAt) {
+            user.otp = null;
+            user.otpExpiresAt = null;
+            await user.save();
+            return res.status(400).json({ message: 'OTP has expired. Please request a new one.' });
+        }
+
+        if (otp.trim() !== user.otp) {
+            return res.status(400).json({ message: 'Invalid OTP. Please check and try again.' });
+        }
+
+        // Success — mark as verified and clear OTP
+        user.emailVerified = true;
+        user.otp = null;
+        user.otpExpiresAt = null;
+        await user.save();
+
+        res.json({ message: 'Email verified successfully!', emailVerified: true });
+    } catch (error) {
+        console.error('OTP verify error:', error);
+        res.status(500).json({ message: 'Failed to verify OTP' });
+    }
+});
+
+// Get OTP verification status (used by frontend on load)
+app.get('/api/otp/status', verifyToken, async (req, res) => {
+    res.json({ emailVerified: req.user.emailVerified });
+});
+
 // End of Routes and Tasks
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

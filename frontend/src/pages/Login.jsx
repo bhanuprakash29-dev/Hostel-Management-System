@@ -22,7 +22,7 @@ const Login = () => {
     setIsEmailLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard");
+      navigate("/verify-email");
     } catch (err) {
       if (err.code === 'auth/wrong-password') {
         setError("The password you entered is incorrect. Please try again.");
@@ -44,7 +44,7 @@ const Login = () => {
     setIsGoogleLoading(true);
     try {
       await signInWithPopup(auth, googleProvider);
-      navigate("/dashboard");
+      navigate("/verify-email");
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user') {
         setError(err.message);

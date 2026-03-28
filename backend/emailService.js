@@ -1,24 +1,19 @@
-const nodemailer = require('nodemailer');
-
-// Brevo SMTP transporter
-// SMTP key (xsmtpsib-...) is used as the PASSWORD
-// Your Brevo account login email is the USERNAME
-const transporter = nodemailer.createTransport({
-    host: 'smtp-relay.brevo.com',
-    port: 587,
-    secure: false, // TLS via STARTTLS
-    auth: {
-        user: process.env.BREVO_SMTP_USER,   // your Brevo account email
-        pass: process.env.BREVO_API_KEY      // the xsmtpsib-... key
-    }
-});
+const axios = require('axios');
 
 const sendOtpEmail = async (toEmail, toName, otp) => {
-    const mailOptions = {
-        from: `"${process.env.BREVO_SENDER_NAME || 'EliteHostel'}" <${process.env.BREVO_SENDER_EMAIL || process.env.BREVO_SMTP_USER}>`,
-        to: toEmail,
+    const data = {
+        sender: {
+            name: process.env.BREVO_SENDER_NAME || 'EliteHostel',
+            email: process.env.BREVO_SENDER_EMAIL || process.env.BREVO_SMTP_USER
+        },
+        to: [
+            {
+                email: toEmail,
+                name: toName || 'Student'
+            }
+        ],
         subject: 'Your EliteHostel Verification Code',
-        html: `
+        htmlContent: `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -71,12 +66,21 @@ const sendOtpEmail = async (toEmail, toName, otp) => {
     };
 
     try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`OTP email sent to ${toEmail}, messageId: ${info.messageId}`);
-        return { success: true, messageId: info.messageId };
+        const response = await axios.post('https://api.brevo.com/v3/smtp/email', data, {
+            headers: {
+                'api-key': process.env.BREVO_API_KEY,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+        
+        console.log(`OTP email sent to ${toEmail}, messageId: ${response.data.messageId}`);
+        return { success: true, messageId: response.data.messageId };
     } catch (error) {
-        console.error('Nodemailer/Brevo SMTP error:', error.message);
-        throw new Error(`Failed to send OTP email: ${error.message}`);
+        // Extract Brevo's specific error message if available
+        const errorMsg = error.response?.data?.message || error.message;
+        console.error('Brevo REST API error:', errorMsg);
+        throw new Error(`Failed to send OTP email: ${errorMsg}`);
     }
 };
 

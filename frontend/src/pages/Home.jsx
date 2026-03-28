@@ -24,10 +24,10 @@ const Home = ({ user }) => {
                         ) : (
                             <>
                                 <Link to="/sign-up" className="btn btn-primary btn-lg px-5 py-3 fw-700 shadow-sm">
-                                    Secure A Room
+                                    Sign Up
                                 </Link>
                                 <Link to="/sign-in" className="btn btn-outline-dark btn-lg px-5 py-3 fw-700">
-                                    Portal Login
+                                    Sign In
                                 </Link>
                             </>
                         )}

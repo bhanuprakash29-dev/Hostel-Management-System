@@ -11,6 +11,7 @@ const StudentProfile = ({ user }) => {
         phone: user?.phone || '',
         address: user?.address || ''
     });
+    const [dbUser, setDbUser] = useState(null);
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isUpdating, setIsUpdating] = useState(false);
@@ -40,6 +41,7 @@ const StudentProfile = ({ user }) => {
                     phone: userData.phone || '',
                     address: userData.address || ''
                 });
+                setDbUser(userData);
             } catch (err) {
                 console.error("Error fetching data", err);
             } finally {
@@ -165,10 +167,10 @@ const StudentProfile = ({ user }) => {
                                         placeholder="City, State, Country" 
                                     />
                                 </div>
-                                <div className="col-md-12 mt-4 text-end">
+                                <div className="col-12 mt-4 text-end">
                                     <button 
                                         type="submit" 
-                                        className="btn btn-primary px-5 rounded-pill fw-bold shadow-sm"
+                                        className="btn btn-primary px-5 rounded-pill fw-bold shadow-sm w-100"
                                         disabled={isUpdating}
                                     >
                                         {isUpdating ? 'Saving...' : 'Save Changes'}
@@ -197,14 +199,18 @@ const StudentProfile = ({ user }) => {
                                     </p>
                                     <p className="text-muted small mb-4">{new Date(booking.appliedAt).toLocaleDateString()}</p>
                                     
-                                    <div className="bg-light w-100 p-3 rounded-4">
+                                    <div className="bg-light w-100 p-3 rounded-4 mt-3">
                                         <div className="d-flex justify-content-between small mb-2 text-dark">
                                             <span>Room Allocation:</span>
-                                            <span className="fw-bold">{user.roomAllocation || 'Not Allocated'}</span>
+                                            <span className="fw-bold">{dbUser?.roomAllocation || 'Not Allocated'}</span>
+                                        </div>
+                                        <div className="d-flex justify-content-between small mb-2 text-dark">
+                                            <span>Overall Status:</span>
+                                            <span className="fw-bold">{dbUser?.status || 'Pending'}</span>
                                         </div>
                                         <div className="d-flex justify-content-between small text-dark">
                                             <span>Payment Status:</span>
-                                            <span className={`fw-bold ${user.paymentStatus === 'Paid' ? 'text-success' : 'text-danger'}`}>{user.paymentStatus || 'Pending'}</span>
+                                            <span className={`fw-bold ${dbUser?.paymentStatus === 'Paid' ? 'text-success' : 'text-danger'}`}>{dbUser?.paymentStatus || 'Pending'}</span>
                                         </div>
                                     </div>
                                 </>

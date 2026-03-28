@@ -7,6 +7,9 @@ import axios from 'axios';
 const Navbar = ({ user }) => {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
+    const [isNavCollapsed, setIsNavCollapsed] = useState(true);
+
+    const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
 
     useEffect(() => {
         if (!user) return;
@@ -53,10 +56,10 @@ const Navbar = ({ user }) => {
                 <Link className="navbar-brand fw-800 text-dark d-flex align-items-center" to={user ? "/dashboard" : "/"}>
                     ELITE<span className="text-primary">HOSTEL</span>
                 </Link>
-                <button className="navbar-toggler border-0 shadow-none px-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <button className="navbar-toggler border-0 shadow-none px-0" type="button" onClick={handleNavCollapse} aria-expanded={!isNavCollapsed}>
                     <span className="navbar-toggler-icon"></span>
                 </button>
-                <div className="collapse navbar-collapse" id="navbarNav">
+                <div className={`${isNavCollapsed ? 'collapse' : ''} navbar-collapse`} id="navbarNav">
                     <ul className="navbar-nav ms-auto align-items-center fw-600">
                         {user ? (
                             <>

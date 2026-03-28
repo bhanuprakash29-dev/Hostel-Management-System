@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import axios from "axios";
 
-const API = import.meta.env.VITE_API_URL || "https://hostel-management-system-11.onrender.com";
 
 const VerifyOtp = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -35,7 +34,7 @@ const VerifyOtp = () => {
     try {
       const token = await firebaseUser.getIdToken();
       const res = await axios.post(
-        `${API}/api/otp/send`,
+        `/api/otp/send`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -105,7 +104,7 @@ const VerifyOtp = () => {
       if (!firebaseUser) throw new Error("Session expired. Please log in again.");
       const token = await firebaseUser.getIdToken();
       const res = await axios.post(
-        `${API}/api/otp/verify`,
+        `/api/otp/verify`,
         { otp: otpValue },
         { headers: { Authorization: `Bearer ${token}` } }
       );

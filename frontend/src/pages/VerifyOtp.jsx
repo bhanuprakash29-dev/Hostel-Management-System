@@ -4,7 +4,7 @@ import { auth } from "../firebase";
 import axios from "axios";
 
 
-const VerifyOtp = () => {
+const VerifyOtp = ({ setEmailVerified }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -39,6 +39,7 @@ const VerifyOtp = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.data.alreadyVerified) {
+        if (setEmailVerified) setEmailVerified(true);
         navigate("/dashboard");
         return;
       }
@@ -109,6 +110,7 @@ const VerifyOtp = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMessage(res.data.message);
+      if (setEmailVerified) setEmailVerified(true);
       setTimeout(() => navigate("/dashboard"), 1200);
     } catch (err) {
       setError(err.response?.data?.message || "Verification failed. Please try again.");

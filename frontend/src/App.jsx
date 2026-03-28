@@ -109,7 +109,7 @@ function App() {
         <Route path="/sign-up" element={!user ? <Register /> : getDashboardRedirect()} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify/:uid" element={<VerifyCard />} />
-        <Route path="/verify-email" element={user ? <VerifyOtp /> : <Navigate to="/sign-in" />} />
+        <Route path="/verify-email" element={user ? <VerifyOtp setEmailVerified={setEmailVerified} /> : <Navigate to="/sign-in" />} />
 
         {/* --- STUDENT ROUTES --- */}
         <Route
